@@ -2,7 +2,7 @@ import logging
 from telegram.ext import *
 # from telegram.ext import Application, MessageHandler, filters
 from adminregistration import Admin_registration
-from stoke_analysis import Moex_ta
+# from stoke_analysis import Moex_ta
 import telegram
 from telegram import ReplyKeyboardMarkup
 from token_bot import TOKEN
