@@ -11,25 +11,30 @@ class Admin_registration:
         try:
             with open(self.file_admin_registration, 'r', encoding='utf-8') as files:
                 flag = False
-                n = json.load(files)
-                count = int(n["count_admins"]) + 1
-                if self.admin_name not in n.keys() and self.id_admin not in n.values():
+                dict_registration = json.load(files)
+                count = int(dict_registration["count_admins"]) + 1
+                if self.admin_name not in dict_registration.keys() and self.id_admin not in dict_registration.values():
                     if self.admin_name != '' and self.id_admin != '' and self.admin_name[0] != ' ' and self.id_admin[0] != ' ':
-                        n[self.admin_name] = self.id_admin
+                        dict_registration[self.admin_name] = self.id_admin
                         flag = True
                 if flag:
-                    n["count_admins"] = str(count)
+                    dict_registration["count_admins"] = str(count)
             with open(self.file_admin_registration, 'w+', encoding='utf-8') as files1:
-                print(n)
-                json.dump(n, files1, indent=2)
+                print(dict_registration)
+                json.dump(dict_registration, files1, indent=2)
         except BaseException:
             return False
 
     def checking_for_admin(self):
         with open(self.file_admin_registration, 'r', encoding='utf-8') as files:
-            n = json.load(files)
-            if self.admin_name not in n.keys() and self.id_admin not in n.values():
+            dict_registration_1 = json.load(files)
+            if self.admin_name not in dict_registration_1.keys() and self.id_admin not in dict_registration_1.values():
                 return True
             return False
 
-
+    def is_checking_for_admin(self):
+        with open(self.file_admin_registration, 'r', encoding='utf-8') as is_files:
+            dict_registration_2 = json.load(is_files)
+            if self.admin_name in dict_registration_2.keys() and self.id_admin in dict_registration_2.values():
+                return True
+            return False
