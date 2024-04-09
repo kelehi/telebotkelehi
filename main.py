@@ -1,7 +1,8 @@
 import logging
+from telegram.ext import *
 # from telegram.ext import Application, MessageHandler, filters
 from adminregistration import Admin_registration
-from telegram.ext import *
+from stoke_analysis import Moex_ta
 import telegram
 from telegram import ReplyKeyboardMarkup
 from token_bot import TOKEN
@@ -15,10 +16,10 @@ logger = logging.getLogger(__name__)
 reply_keyboard = [['/stockmarket', '/functions'],
                   ['/settings', '/info_admin']]
 reply_keyboard_2 = [['/send_document']]
-reply_keyboard_3 = [['/main_menu']]
-reply_keyboard_4 = [['/to_the_main_menu']]
+reply_keyboard_3 = [['/start']]
+reply_keyboard_4 = [['/main_menu']]
 reply_keyboard_5 = [['/documentation', '/admin_user'],
-                    ['/back'], ['/to_the_main_menu']]
+                    ['/main_menu']]
 
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
@@ -30,27 +31,31 @@ markup_5 = ReplyKeyboardMarkup(reply_keyboard_5, one_time_keyboard=False)
 
 async def start(update, context):
     await update.message.reply_text("Здравствуйте! Для продолжение работы с ботом нажмите на кнопку ниже",
-                                    reply_markup=markup_3)
+                                    reply_markup=markup_4)
 
 
 async def admin_user(update, context):
     login_admin = context.args[0]
     password_admin = context.args[1]
     object_class = Admin_registration(login_admin, password_admin)
-    await update.message.reply_text("📁" if object_class.is_checking_for_admin() else 'Доступ запрещен')
+    if object_class.is_checking_for_admin():
+        await update.message.reply_text("📁")
+        await update.message.reply_document('admin_registration.json')
+    else:
+        await update.message.reply_text('Доступ запрещен')
 
 
-async def to_the_main_menu(update, context):
-    await update.message.reply_text('/main_menu')
+# async def to_the_main_menu(update, context):
+#     await update.message.command('/main_menu')
 
 
 async def back(update, context):
-    await update.message.reply_text('/main_menu')
+    await update.message.command('/main_menu')
 
 
 async def documentation(update, context):
     await update.message.reply_text('📁')
-    await update.message.reply_photo('image1.png')
+    await update.message.reply_document('документация.docx')
 
 
 async def main_menu(update, context):
@@ -70,15 +75,15 @@ async def admin_passwd(update, context):
         object_class.registration_admin()
         await update.message.reply_text("🔐")
         await update.message.reply_text("Зарегистрировались! Нажмите на кнопку ниже")
-        await update.message.reply_text('/start')
+        await update.message.reply_text('Нажмите ниже', reply_markup=markup_3)
     else:
         await update.message.reply_text("❌")
         await update.message.reply_text("Логин или пароль занят")
 
 
 async def help(update, context):
-    await update.message.reply_text(
-        "документация")
+    await update.message.reply_document(
+        "документация.docx")
 
 
 async def information_admin(update, context):
@@ -104,7 +109,7 @@ def main():
     application.add_handler(CommandHandler("back", back))
     application.add_handler(CommandHandler("admin_user", admin_user))
     application.add_handler(CommandHandler("documentation", documentation))
-    application.add_handler(CommandHandler("to_the_main_menu", to_the_main_menu))
+    # application.add_handler(CommandHandler("to_the_main_menu", to_the_main_menu))
     application.add_handler(CommandHandler('main_menu', main_menu))
     application.add_handler(CommandHandler("info_admin", information_admin))
     application.add_handler(CommandHandler("stockmarket", stockmarket))
