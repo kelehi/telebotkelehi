@@ -3,7 +3,7 @@ from telegram.ext import *
 # from telegram.ext import Application, MessageHandler, filters
 from adminregistration import Admin_registration
 from stoke_analysis import Moex_ta
-import telegram
+from telegram import *
 from telegram import ReplyKeyboardMarkup
 from token_bot import TOKEN
 logging.basicConfig(
@@ -92,11 +92,12 @@ async def information_admin(update, context):
 
 
 async def stockmarket(update, context):
-    await update.message.reply_text("1")
+    a = Moex_ta('ASTR')
+    await update.message.reply_text(str(a.technical_analysis()))
 
 
 async def functions(update, context):
-    await update.message.reply_text("2")
+    await update.message.reply_text('function')
 
 
 async def settings(update, context):
