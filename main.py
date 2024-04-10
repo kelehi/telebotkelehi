@@ -4,7 +4,7 @@ from telegram.ext import *
 from adminregistration import Admin_registration
 from stoke_analysis import Moex_ta
 import telegram
-from telegram import ReplyKeyboardMarkup
+from telegram import *
 from token_bot import TOKEN
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
