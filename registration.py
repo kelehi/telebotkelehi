@@ -1,36 +1,16 @@
-import json
-
-
 class Registration:
-    def __init__(self, name: str, code: str, file='registration.json'):
-        self.name = name
+    def __init__(self, code: str, file='history_users.txt'):
         self.code = code
         self.file = file
 
+    def request_write(self):
+        with open(self.file, 'a+', encoding='utf-8') as file_write:
+            string_info = self.code + '\n'
+            file_write.write(string_info)
+
+    def request_read(self):
+        with open(self.file, 'r', encoding='utf-8') as file_read:
+            read_admin = file_read.read()
+            return read_admin
 
 
-    def registration(self):
-        try:
-            with open(self.file, 'r', encoding='utf-8') as files:
-                n = json.load(files)
-                count = int(n["count"]) + 1
-                if self.name not in n.keys() and self.code not in n.values():
-                    if self.name != '' and self.code != '' and self.name[0] != ' ' and self.code[0] != ' ':
-                        n[self.name] = self.code
-                    else:
-                        raise Exception('Имя или код заняты')
-                else:
-                    raise Exception('Имя или код заняты')
-                n["count"] = str(count)
-            with open(self.file, 'w+', encoding='utf-8') as files1:
-                print(n)
-                json.dump(n, files1)
-        except Exception as e:
-            print(e)
-
-
-
-name = input()
-code = input()
-c = Registration(name, code)
-c.registration()

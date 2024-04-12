@@ -9,9 +9,9 @@ class Admin_registration:
 
     def registration_admin(self):
         try:
-            with open(self.file_admin_registration, 'r', encoding='utf-8') as files:
+            with open(self.file_admin_registration, 'r', encoding='utf-8') as files_read:
                 flag = False
-                dict_registration = json.load(files)
+                dict_registration = json.load(files_read)
                 count = int(dict_registration["count_admins"]) + 1
                 if self.admin_name not in dict_registration.keys() and self.id_admin not in dict_registration.values():
                     if self.admin_name != '' and self.id_admin != '' and self.admin_name[0] != ' ' and self.id_admin[0] != ' ':
@@ -19,9 +19,8 @@ class Admin_registration:
                         flag = True
                 if flag:
                     dict_registration["count_admins"] = str(count)
-            with open(self.file_admin_registration, 'w+', encoding='utf-8') as files1:
-                print(dict_registration)
-                json.dump(dict_registration, files1, indent=2)
+            with open(self.file_admin_registration, 'w+', encoding='utf-8') as files_write:
+                json.dump(dict_registration, files_write, indent=2)
         except BaseException:
             return False
 

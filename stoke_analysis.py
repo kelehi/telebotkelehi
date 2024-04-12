@@ -92,3 +92,9 @@ class Moex_ta:
 
             dict_recommendation = dict(activ.get_analysis().summary)
             return dict_recommendation['RECOMMENDATION']
+
+
+# class Crypto(Moex_ta):
+#     def __init__(self, activ, timeframe):
+#         super().__init__(activ, timeframe)
+

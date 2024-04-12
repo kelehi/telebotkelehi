@@ -1,9 +1,11 @@
 import logging
+import os
 from telegram.ext import *
 # from telegram.ext import Application, MessageHandler, filters
+from requestsserver import Stoke_Market_chart
 from adminregistration import Admin_registration
 from stoke_analysis import Moex_ta
-import telegram
+from registration import Registration
 from telegram import *
 from token_bot import TOKEN
 logging.basicConfig(
@@ -20,13 +22,17 @@ reply_keyboard_3 = [['/start']]
 reply_keyboard_4 = [['/main_menu']]
 reply_keyboard_5 = [['/documentation', '/admin_user'],
                     ['/main_menu']]
-
+reply_keyboard_6 = [['/chart', '/analiz'],
+                    ['/main_menu']]
+reply_keyboard_7 = [['/work_music'], ['/main_menu']]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 markup_2 = ReplyKeyboardMarkup(reply_keyboard_2, one_time_keyboard=False)
 markup_3 = ReplyKeyboardMarkup(reply_keyboard_3, one_time_keyboard=True)
 markup_4 = ReplyKeyboardMarkup(reply_keyboard_4, one_time_keyboard=True)
 markup_5 = ReplyKeyboardMarkup(reply_keyboard_5, one_time_keyboard=False)
+markup_6 = ReplyKeyboardMarkup(reply_keyboard_6, one_time_keyboard=True)
+markup_7 = ReplyKeyboardMarkup(reply_keyboard_7, one_time_keyboard=False)
 
 
 async def start(update, context):
@@ -40,17 +46,9 @@ async def admin_user(update, context):
     object_class = Admin_registration(login_admin, password_admin)
     if object_class.is_checking_for_admin():
         await update.message.reply_text("📁")
-        await update.message.reply_document('admin_registration.json')
+        await update.message.reply_document('history_users.txt')
     else:
         await update.message.reply_text('Доступ запрещен')
-
-
-# async def to_the_main_menu(update, context):
-#     await update.message.command('/main_menu')
-
-
-async def back(update, context):
-    await update.message.command('/main_menu')
 
 
 async def documentation(update, context):
@@ -60,8 +58,9 @@ async def documentation(update, context):
 
 async def main_menu(update, context):
     user = update.effective_user
+    text = 'Я бот, имеющий возможность работать с данными биржи, и имею дополнительные функции'
     await update.message.reply_html(
-        rf"Привет {user.mention_html()}! Я бот, имеющий возможность работать с данными биржи, и имею дополнительные функции, о которых ты можешь прочитать в пункте настройки документация",
+        rf"Привет {user.mention_html()}! {text}, о которых ты можешь прочитать в пункте настройки документация",
         reply_markup=markup
     )
     await update.message.reply_text("Выберите функцию")
@@ -74,16 +73,52 @@ async def admin_passwd(update, context):
     if object_class.checking_for_admin():
         object_class.registration_admin()
         await update.message.reply_text("🔐")
-        await update.message.reply_text("Зарегистрировались! Нажмите на кнопку ниже")
+        await update.message.reply_text("Регистрация прошла успешна!")
         await update.message.reply_text('Нажмите ниже', reply_markup=markup_3)
     else:
         await update.message.reply_text("❌")
         await update.message.reply_text("Логин или пароль занят")
 
 
+async def analiz(update, context):
+    activ = context.args
+    if len(activ) == 0:
+        text = "Для того чтобы команда заработала нужно вести '/analiz {тикер акции} {таймфрейм}'"
+        text_2 = 'Параметр тайфрейм необязательный, но если его не использовать то будет стоять дневной тайфрейм'
+        await update.message.reply_text(f'{text} {text_2}. Списком где хранятся расшифровки таймфреймов отправлен ниже')
+        await update.message.reply_document('timeframes.txt')
+    else:
+        if len(activ) == 1:
+            object_class_Moex_one_argument = Moex_ta(activ[0])
+            await update.message.reply_text(object_class_Moex_one_argument.technical_analysis())
+
+        elif len(activ) == 2:
+            object_class_Moex_two = Moex_ta(activ[0], activ[1])
+            await update.message.reply_text(object_class_Moex_two.technical_analysis())
+
+        else:
+            await update.message.reply_text('Введены неверные данные')
+            await update.message.reply_document('timeframes.txt')
+
+
 async def help(update, context):
+    URL = 'https://disk.yandex.ru/i/NJ3zby3bwgm9lA'
+    await update.message.reply_html(rf'Если документ не загружается можете перейти по ссылки <a href="{URL}">тут</a>')
     await update.message.reply_document(
         "документация.docx")
+
+
+async def chart(update, context):
+    active = context.args[0]
+    initial_time = context.args[1]
+    end_time = context.args[2]
+    object_5 = Stoke_Market_chart(active, initial_time, end_time)
+    active_write = Registration(active)
+    active_write.request_write()
+    file_name = object_5.chart()
+    await update.message.reply_photo(file_name)
+    await update.message.reply_text(f'{active} {initial_time} {end_time}')
+    os.remove(file_name)
 
 
 async def information_admin(update, context):
@@ -92,11 +127,16 @@ async def information_admin(update, context):
 
 
 async def stockmarket(update, context):
-    await update.message.reply_text("1")
+    await update.message.reply_text(
+        "Вам доступнен режим 'биржа' вибирайте функция", reply_markup=markup_6)
+
+
+async def work_music(update, context):
+    await update.message.reply_audio('in.wav')
 
 
 async def functions(update, context):
-    await update.message.reply_text("2")
+    await update.message.reply_text('Выберите функцию', reply_markup=markup_7)
 
 
 async def settings(update, context):
@@ -106,10 +146,11 @@ async def settings(update, context):
 def main():
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("back", back))
+    application.add_handler(CommandHandler("chart", chart))
+    application.add_handler(CommandHandler("analiz", analiz))
+    application.add_handler(CommandHandler("work_music", work_music))
     application.add_handler(CommandHandler("admin_user", admin_user))
     application.add_handler(CommandHandler("documentation", documentation))
-    # application.add_handler(CommandHandler("to_the_main_menu", to_the_main_menu))
     application.add_handler(CommandHandler('main_menu', main_menu))
     application.add_handler(CommandHandler("info_admin", information_admin))
     application.add_handler(CommandHandler("stockmarket", stockmarket))
