@@ -24,14 +24,14 @@ class Admin_registration:
         except BaseException:
             return False
 
-    def checking_for_admin(self):
+    def checking_for_admin(self) -> bool:
         with open(self.file_admin_registration, 'r', encoding='utf-8') as files:
             dict_registration_1 = json.load(files)
             if self.admin_name not in dict_registration_1.keys() and self.id_admin not in dict_registration_1.values():
                 return True
             return False
 
-    def is_checking_for_admin(self):
+    def is_checking_for_admin(self) -> bool:
         with open(self.file_admin_registration, 'r', encoding='utf-8') as is_files:
             dict_registration_2 = json.load(is_files)
             if self.admin_name in dict_registration_2.keys() and self.id_admin in dict_registration_2.values():

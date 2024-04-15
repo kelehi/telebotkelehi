@@ -3,7 +3,6 @@ import requests
 from matplotlib import pyplot as plt
 from random import choice
 import string
-import datetime
 
 
 class Stoke_Market_chart:
@@ -12,7 +11,7 @@ class Stoke_Market_chart:
         self.initial_time = initial_time
         self.end_time = end_time
 
-    def chart(self):
+    def chart(self) -> str:
         get_request = requests.get(
             f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{self.active}/candles.json?from={self.initial_time}&till={self.end_time}&interval=24').json()
         data = []
