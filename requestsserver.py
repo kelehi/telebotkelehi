@@ -5,7 +5,7 @@ from random import choice
 import string
 
 
-class Stoke_Market_chart:
+class Stoсke_Market_chart:
     def __init__(self, active: str, initial_time: str, end_time: str):
         self.active = active
         self.initial_time = initial_time

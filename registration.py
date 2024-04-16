@@ -1,4 +1,4 @@
-class Registration:
+class Write:
     def __init__(self, code: str, file='history_users.txt'):
         self.code = code
         self.file = file

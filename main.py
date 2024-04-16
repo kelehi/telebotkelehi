@@ -6,11 +6,11 @@ from threading import *
 from random import choice
 from images_class import Filter
 # from telegram.ext import Application, MessageHandler, filters
-from requestsserver import Stoke_Market_chart
+from requestsserver import Stoсke_Market_chart
 # from database import Database
 from adminregistration import Admin_registration
-from stoke_analysis import Moex_ta
-from registration import Registration
+from stoke_analysis import Moex_ta, Crypto
+from registration import Write
 from telegram import *
 from token_bot import TOKEN
 logging.basicConfig(
@@ -29,8 +29,12 @@ reply_keyboard_5 = [['/documentation', '/admin_user'],
                     ['/main_menu']]
 reply_keyboard_6 = [['/chart', '/analysis'],
                     ['/main_menu']]
-reply_keyboard_7 = [['/work_music'], ['/main_menu']]
+reply_keyboard_7 = [['/work_photo'], ['/work_music'],
+                    ['/main_menu']]
 reply_keyboard_8 = [['/functions'], ['/main_menu']]
+reply_keyboard_9 = [['/analysis_stocks'], ['/crypto'],
+                    ['/main_menu']]
+reply_keyboard_10 = [['/main_menu']]
 
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 markup_2 = ReplyKeyboardMarkup(reply_keyboard_2, one_time_keyboard=False)
@@ -40,12 +44,15 @@ markup_5 = ReplyKeyboardMarkup(reply_keyboard_5, one_time_keyboard=False)
 markup_6 = ReplyKeyboardMarkup(reply_keyboard_6, one_time_keyboard=True)
 markup_7 = ReplyKeyboardMarkup(reply_keyboard_7, one_time_keyboard=False)
 markup_8 = ReplyKeyboardMarkup(reply_keyboard_8, one_time_keyboard=True)
+markup_9 = ReplyKeyboardMarkup(reply_keyboard_9, one_time_keyboard=False)
+markup_10 = ReplyKeyboardMarkup(reply_keyboard_10, one_time_keyboard=False)
 
 PHOTO = 1
+MUSIC = 2
 
 
 async def start(update, context):
-    await update.message.reply_text("Здравствуйте! Для продолжение работы с ботом нажмите на кнопку ниже",
+    await update.message.reply_text("Для продолжение работы с ботом нажмите на кнопку ниже",
                                     reply_markup=markup_4)
 
 
@@ -65,6 +72,34 @@ async def admin_user(update, context):
     except IndexError:
         await update.message.reply_text("команда недоступна")
 
+
+async def analysis(update, context):
+    await update.message.reply_text('Выберите функцию', reply_markup=markup_9)
+
+
+async def crypto(update, context):
+    try:
+        activ = context.args
+        if len(activ) == 0:
+            text = "Для того чтобы команда заработала нужно вести '/analysis {тикер акции} {таймфрейм}'"
+            text_2 = 'Параметр тайфрейм необязательный, но если его не использовать то будет стоять дневной тайфрейм'
+            await update.message.reply_text(
+                f'{text} {text_2}. Списком где хранятся расшифровки таймфреймов отправлен ниже')
+            await update.message.reply_document('timeframes.txt')
+        else:
+            if len(activ) == 1:
+                object_class_Moex_one_argument = Crypto(activ[0])
+                await update.message.reply_text(object_class_Moex_one_argument.technical_analysis())
+
+            elif len(activ) == 2:
+                object_class_Moex_two = Crypto(activ[0], activ[1])
+                await update.message.reply_text(object_class_Moex_two.technical_analysis())
+
+            else:
+                await update.message.reply_text('Введены неверные данные')
+                await update.message.reply_document('timeframes.txt')
+    except BaseException:
+        await update.message.reply_text("Введены некорректные данные")
 
 
 async def documentation(update, context):
@@ -94,16 +129,21 @@ async def admin_passwd(update, context):
             await update.message.reply_text('Нажмите ниже', reply_markup=markup_3)
         else:
             await update.message.reply_text("❌")
-            await update.message.reply_text("Логин или пароль занят. Повторите попытку или вернитесь на главную")
+            await update.message.reply_text("Логин или пароль занят. Повторите попытку или вернитесь на главную",
+                                            reply_markup=reply_keyboard_10)
     except IndexError:
         await update.message.reply_text("команда недоступна!")
 
 
-async def analysis(update, context):
+async def work_music(update, context):
+    await update.message.reply_text('Выберите функцию')
+
+
+async def analysis_stocks(update, context):
     try:
         activ = context.args
         if len(activ) == 0:
-            text = "Для того чтобы команда заработала нужно вести '/analysis {тикер акции} {таймфрейм}'"
+            text = "Для того чтобы команда заработала нужно вести '/analysis {тикер криптовалюты} {таймфрейм}'"
             text_2 = 'Параметр тайфрейм необязательный, но если его не использовать то будет стоять дневной тайфрейм'
             await update.message.reply_text(
                 f'{text} {text_2}. Списком где хранятся расшифровки таймфреймов отправлен ниже')
@@ -124,7 +164,7 @@ async def analysis(update, context):
         await update.message.reply_text("Введены некорректные данные")
 
 
-async def work_music(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def work_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Прикрепите фото!")
 
     return PHOTO
@@ -157,8 +197,8 @@ async def chart(update, context):
         active = context.args[0]
         initial_time = context.args[1]
         end_time = context.args[2]
-        object_5 = Stoke_Market_chart(active, initial_time, end_time)
-        active_write = Registration(active)
+        object_5 = Stoсke_Market_chart(active, initial_time, end_time)
+        active_write = Write(active)
         active_write.request_write()
         file_name = object_5.chart()
         await update.message.reply_photo(file_name)
@@ -180,7 +220,7 @@ async def stockmarket(update, context):
 
 
 async def delete(update, context):
-    await update.message.reply_text("")
+    await update.message.reply_text(" ")
 
 
 async def functions(update, context):
@@ -196,7 +236,7 @@ def main():
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("chart", chart))
-    application.add_handler(CommandHandler("analysis", analysis))
+    application.add_handler(CommandHandler("analysis_stocks", analysis_stocks))
     application.add_handler(CommandHandler("admin_user", admin_user))
     application.add_handler(CommandHandler("documentation", documentation))
     application.add_handler(CommandHandler('main_menu', main_menu))
@@ -204,8 +244,10 @@ def main():
     application.add_handler(CommandHandler("stockmarket", stockmarket))
     application.add_handler(CommandHandler("functions", functions))
     application.add_handler(CommandHandler("settings", settings))
+    application.add_handler(CommandHandler('crypto', crypto))
+    application.add_handler(CommandHandler('analysis', analysis))
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("work_music", work_music)],
+        entry_points=[CommandHandler("work_photo", work_photo)],
         states={
             PHOTO: [MessageHandler(filters.PHOTO, photo)]
         },
