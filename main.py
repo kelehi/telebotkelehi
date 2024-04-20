@@ -8,7 +8,6 @@ from telegram import *
 
 from token_bot import TOKEN
 from images_class import Filter
-# from telegram.ext import Application, MessageHandler, filters
 from database import Database
 from requestsserver import Stoсke_Market_chart
 from adminregistration import Admin_registration
