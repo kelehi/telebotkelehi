@@ -7,7 +7,6 @@ from telegram.ext import *
 from telegram import *
 
 from token_bot import TOKEN
-from threading import *
 from images_class import Filter
 # from telegram.ext import Application, MessageHandler, filters
 from database import Database
@@ -62,13 +61,13 @@ STOCK_MARKET = 5
 database = Database()
 
 
-async def start(update, context):
+async def start(update, context):  # Старт бота
     user = update.effective_user
     await update.message.reply_html(
         rf"Привет {user.mention_html()}! Для продолжение работы с ботом нажмите на кнопку ниже", reply_markup=markup_4)
 
 
-async def main_menu(update, context):
+async def main_menu(update, context):  # Главное меню
     text = 'Я бот, имеющий возможность работать с данными биржи, и имею дополнительные функции'
     await update.message.reply_text(
         f"{text}, о которых ты можешь прочитать в пункте настройки документация", reply_markup=markup)
@@ -76,35 +75,35 @@ async def main_menu(update, context):
     await update.message.reply_text("Выберите функцию")
 
 
-async def stockmarket(update, context):
+async def stockmarket(update, context):  # функция для перехода в раздел 'биржа'
     await update.message.reply_text("Вам доступнен режим 'биржа' вибирайте функцию", reply_markup=markup_6)
 
 
-async def functions(update, context):
+async def functions(update, context):  # функция для перехода в раздел 'дополнительные функции'
     await update.message.reply_text('Выберите функцию', reply_markup=markup_7)
 
 
-async def settings(update, context):
+async def settings(update, context):  # функция для перехода в раздел 'настройки'
     await update.message.reply_text('💡', reply_markup=markup_5)
 
 
-async def information_admin(update, context):
+async def information_admin(update, context):  # функция для получения информации о создателе
     await update.message.reply_text(
         "Создатель проекта: Рязанов, Роман", reply_markup=markup_4)
 
 
-async def analysis(update, context):
+async def analysis(update, context):  # функция для перехода в раздел 'технческий анализ'
     await update.message.reply_text('Выберите функцию', reply_markup=markup_9)
 
 
-async def start_chart(update, context):
+async def start_chart(update, context):  # Запуск графика
     await update.message.reply_text(
         'Введите данные: тикер акции начальная дата конечная дата. Пример: YNDX 23-11-01 24-04-15')
 
     return CHART
 
 
-async def chart(update, context):
+async def chart(update, context):  # Рисование и отправка графика
     try:
         active = str(update.message.text).split()[0]
         initial_time = str(update.message.text).split()[1]
@@ -117,13 +116,13 @@ async def chart(update, context):
         await update.message.reply_photo(file_name)
         await update.message.reply_text(f'{active} {initial_time} {end_time}')
         os.remove(file_name)
-    except BaseException as e:
-        await update.message.reply_text(f'Ошибка к доступа к серверу или неправильный формат ввода {e}')
+    except BaseException:
+        await update.message.reply_text(f'Ошибка к доступа к серверу или неправильный формат ввода')
 
     return ConversationHandler.END
 
 
-async def start_analysis_stocks(update, context):
+async def start_analysis_stocks(update, context):  # старт анализа (Акции)
     await update.message.reply_text(
         "Введите тикер акции и таймфрейм. Пример запроса: ASTR 1w. Файл с таймфреймеми отправлен ниже")
     await update.message.reply_document('timeframes.txt')
@@ -131,7 +130,7 @@ async def start_analysis_stocks(update, context):
     return STOCK_MARKET
 
 
-async def analysis_stocks(update, context):
+async def analysis_stocks(update, context):  # технический анализ (Акции)
     try:
         activ = str(update.message.text).split()
         if len(activ) == 1:
@@ -161,15 +160,16 @@ async def analysis_stocks(update, context):
     return ConversationHandler.END
 
 
-async def start_crypto(update, context):
+async def start_crypto(update, context):  # старт анализа (Криптовалюта)
+    text = 'Файл с таймфреймеми отправлен ниже'
     await update.message.reply_text(
-        "Введите тикер акции и таймфрейм. Пример запроса: BTCUSD 1w. Файл с таймфреймеми отправлен ниже")
+        f"Введите тикер криптовалюты и таймфрейм. Пример запроса для биткоина: BTCUSD 1w. {text}")
     await update.message.reply_document('timeframes.txt')
 
     return CRYPTOCURRENCY
 
 
-async def cryptocurrency(update, context):
+async def cryptocurrency(update, context):  # технический анализ (Криптовалюта)
     try:
         activ = str(update.message.text).split()
 
@@ -192,12 +192,13 @@ async def cryptocurrency(update, context):
     return ConversationHandler.END
 
 
-async def documentation(update, context):
+async def documentation(update, context):  # Отправляем документацию
     await update.message.reply_text('📁')
     await update.message.reply_document('документация.docx')
 
 
 async def admin_user(update, context):
+    # Проверяем является ли пользователь админом, если да, отправляем админскую информацию
     try:
         login_admin = context.args[0]
         password_admin = context.args[1]
@@ -212,17 +213,18 @@ async def admin_user(update, context):
         await update.message.reply_text("команда недоступна")
 
 
-async def send_music(update, context):
+async def send_music(update, context):  # Отправляем аудиофайл
     await update.message.reply_audio('file_audio.mp3')
 
 
-async def work_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def work_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):  # Старт наложения фильтра на фото
     await update.message.reply_text("Прикрепите фото!")
 
     return PHOTO
 
 
-async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # сохраняем накладываем фильтер отправлем новое фото
     user = update.message.from_user
     string_random = ''.join([choice([element for element in string.ascii_letters]) for _ in range(10)])
     photo_file = await update.message.photo[-1].get_file()
@@ -238,7 +240,7 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     return ConversationHandler.END
 
 
-async def admin_passwd(update, context):
+async def admin_passwd(update, context):  # Регистрируем админа
     try:
         login_admin = context.args[0]
         password_admin = context.args[1]
@@ -251,17 +253,16 @@ async def admin_passwd(update, context):
         else:
             await update.message.reply_text("❌")
             await update.message.reply_text("Логин или пароль занят. Повторите попытку или вернитесь на главную",
-                                            reply_markup=reply_keyboard_10)
+                                            reply_markup=markup_10)
     except IndexError:
         await update.message.reply_text("команда недоступна!")
 
 
-async def help(update, context):
+async def help(update, context):  # Отправка документации
     URL = 'https://disk.yandex.ru/i/NJ3zby3bwgm9lA'
     await update.message.reply_html(rf'Если документ не загружается можете перейти по ссылки <a href="{URL}">тут</a>')
     await update.message.reply_document(
         "документация.docx")
-
 
 
 def main():

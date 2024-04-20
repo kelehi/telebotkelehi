@@ -12,11 +12,13 @@ class Stoсke_Market_chart:
         self.end_time = end_time
 
     def chart(self) -> str:
+        text = 'iss.moex.com/iss/engines/stock/markets/shares/securities'
+        text_2 = 'candles.json?from'
         get_request = requests.get(
-            f'http://iss.moex.com/iss/engines/stock/markets/shares/securities/{self.active}/candles.json?from={self.initial_time}&till={self.end_time}&interval=24').json()
+            f'http://{text}/{self.active}/{text_2}={self.initial_time}&till={self.end_time}&interval=24').json()
         data = []
-        for i in get_request['candles']['data']:
-            data.append({j: i[number] for number, j in enumerate(get_request['candles']['columns'])})
+        for element_dict in get_request['candles']['data']:
+            data.append({j: element_dict[number] for number, j in enumerate(get_request['candles']['columns'])})
         frame = pd.DataFrame(data)
         random_symbol = [choice([element for element in string.ascii_letters]) for _ in range(5)]
         plt.plot(list(frame['close']))
