@@ -14,9 +14,10 @@ class Admin_registration:
                 dict_registration = json.load(files_read)
                 count = int(dict_registration["count_admins"]) + 1
                 if self.admin_name not in dict_registration.keys() and self.id_admin not in dict_registration.values():
-                    if self.admin_name != '' and self.id_admin != '' and self.admin_name[0] != ' ' and self.id_admin[0] != ' ':
-                        dict_registration[self.admin_name] = self.id_admin
-                        flag = True
+                    if self.admin_name != '' and self.id_admin != '' and self.admin_name[0] != ' ':
+                        if self.id_admin[0] != ' ':
+                            dict_registration[self.admin_name] = self.id_admin
+                            flag = True
                 if flag:
                     dict_registration["count_admins"] = str(count)
             with open(self.file_admin_registration, 'w+', encoding='utf-8') as files_write:

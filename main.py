@@ -115,6 +115,7 @@ async def chart(update, context):  # Рисование и отправка гр
         await update.message.reply_photo(file_name)
         await update.message.reply_text(f'{active} {initial_time} {end_time}')
         os.remove(file_name)
+
     except BaseException:
         await update.message.reply_text(f'Ошибка к доступа к серверу или неправильный формат ввода')
 
@@ -154,7 +155,7 @@ async def analysis_stocks(update, context):  # технический анали
             await update.message.reply_document('timeframes.txt')
 
     except BaseException:
-        await update.message.reply_text("Введены некорректные данные")
+        await update.message.reply_text("Введены некорректные данные", reply_markup=markup_11)
 
     return ConversationHandler.END
 
@@ -208,6 +209,7 @@ async def admin_user(update, context):
             await update.message.reply_text(f'{database.read_database()}')
         else:
             await update.message.reply_text('Доступ запрещен')
+
     except IndexError:
         await update.message.reply_text("команда недоступна")
 
