@@ -2,7 +2,7 @@ from tradingview_ta import TA_Handler, Interval
 
 
 class Moex_ta:
-    def __init__(self, active: str, timeframe: None):
+    def __init__(self, active: str, timeframe=None):
         self.active = active
         self.timeframe = timeframe
 
@@ -95,7 +95,7 @@ class Moex_ta:
 
 
 class Crypto(Moex_ta):
-    def __init__(self, activ: str, timeframe):
+    def __init__(self, activ: str, timeframe=None):
         super().__init__(activ, timeframe)
 
     def time_frame(self) -> str:

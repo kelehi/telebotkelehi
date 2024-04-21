@@ -146,16 +146,13 @@ async def analysis_stocks(update, context):  # технический анали
             activ_2 = Moex_ta(activ[0], activ[1])
             await update.message.reply_text(activ_2.technical_analysis(), reply_markup=markup_11)
 
-        else:
-            await update.message.reply_text('Введены неверные данные')
-            text = "Для того чтобы команда заработала нужно вести {тикер акции} {таймфрейм}'"
-            text_2 = 'Параметр тайфрейм необязательный, но если его не использовать то будет стоять дневной тайфрейм'
-            await update.message.reply_text(
-                f'{text} {text_2}. Списком где хранятся расшифровки таймфреймов отправлен ниже')
-            await update.message.reply_document('timeframes.txt')
-
     except BaseException:
-        await update.message.reply_text("Введены некорректные данные", reply_markup=markup_11)
+        text = "Для того чтобы команда заработала нужно вести {тикер акции} {таймфрейм}'"
+        text_2 = 'Параметр тайфрейм необязательный, но если его не использовать то будет стоять дневной тайфрейм'
+        await update.message.reply_text(
+            f'{text} {text_2}. Списком где хранятся расшифровки таймфреймов отправлен ниже')
+        await update.message.reply_text(f"Введены некорректные данные", reply_markup=markup_11)
+        await update.message.reply_document('timeframes.txt')
 
     return ConversationHandler.END
 
@@ -174,10 +171,14 @@ async def cryptocurrency(update, context):  # технический анали�
         activ = str(update.message.text).split()
 
         if len(activ) == 1:
+            active_write = Write(activ[0])
+            active_write.request_write()
             activ_1 = Crypto(activ[0])
             await update.message.reply_text(activ_1.technical_analysis())
 
         elif len(activ) == 2:
+            active_write = Write(activ[0])
+            active_write.request_write()
             active_2 = Crypto(activ[0], activ[1])
             await update.message.reply_text(active_2.technical_analysis(), reply_markup=markup_11)
 
