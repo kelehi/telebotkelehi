@@ -69,7 +69,7 @@ async def start(update, context):  # Старт бота
 async def main_menu(update, context):  # Главное меню
     text = 'Я бот, имеющий возможность работать с данными биржи, и имею дополнительные функции'
     await update.message.reply_text(
-        f"{text}, о которых ты можешь прочитать в пункте настройки документация", reply_markup=markup)
+        f"{text}, о которых ты можешь прочитать в пункте 'settings' 'documentation'", reply_markup=markup)
 
     await update.message.reply_text("Выберите функцию")
 
